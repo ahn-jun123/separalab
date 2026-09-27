@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SeparaLab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1c2f52; --navy-d:#12203a; --blue:#3f7ce0; --blue-l:#eaf1fd;
+  --bg:#ffffff; --text:#2b2f36; --sub:#5b6270; --line:#e4e7ec; --red:#d64545;
+  --card:#f7f9fc;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;font-family:'Noto Sans KR',Pretendard,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+h1,h2,h3,h4{font-weight:900;color:var(--navy);margin:0 0 10px}
+p{margin:0 0 12px}
+a{color:inherit}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);background:#fff;z-index:10}
+.headbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;max-width:920px;margin:0 auto}
+.logo{font-weight:900;color:var(--navy);font-size:20px;cursor:pointer;letter-spacing:-.5px}
+nav{display:flex;gap:4px}
+nav button{background:none;border:none;font-family:inherit;font-size:14px;font-weight:500;color:var(--sub);padding:8px 12px;border-radius:8px;cursor:pointer}
+nav button.active{color:var(--navy);background:var(--blue-l);font-weight:700}
+main{padding:32px 0 80px}
+.view{display:none}
+.view.active{display:block}
+
+/* HOME */
+.hero{text-align:center;padding:28px 0 10px}
+.hero p{color:var(--sub);font-size:15px}
+.searchbox{display:flex;gap:8px;max-width:520px;margin:20px auto 6px}
+.searchbox input{flex:1;padding:13px 16px;border:2px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit}
+.searchbox input:focus{outline:none;border-color:var(--blue)}
+.searchbox button{background:var(--navy);color:#fff;border:none;padding:0 20px;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit}
+.hint{text-align:center;color:var(--sub);font-size:13px;margin-bottom:36px}
+
+section.block{margin:44px 0}
+section.block h2{font-size:19px;text-align:center;margin-bottom:6px}
+section.block>.desc{text-align:center;color:var(--sub);font-size:14px;margin-bottom:20px}
+
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.mcard{border:1px solid var(--line);border-radius:12px;padding:18px;background:var(--card)}
+.mcard h3{font-size:16px;margin-bottom:6px}
+.mcard .q{font-size:13.5px;color:var(--text);margin-bottom:10px}
+.mcard .tag{display:inline-block;font-size:12px;color:var(--blue);background:var(--blue-l);padding:3px 8px;border-radius:6px;margin:2px 4px 2px 0}
+.mcard button{margin-top:12px;width:100%;background:var(--navy);color:#fff;border:none;padding:9px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:13.5px}
+
+.flow{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:6px}
+.flow .step{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:120px;text-align:center;font-size:13px}
+.flow .step b{display:block;color:var(--navy);font-size:14px;margin-bottom:4px}
+.flow .arrow{display:flex;align-items:center;color:var(--blue);font-weight:900}
+
+.intronote{background:var(--blue-l);border-radius:12px;padding:18px 22px;margin:36px 0}
+.intronote h3{font-size:16px}
+.intronote ul{margin:8px 0 0;padding-left:18px;color:var(--sub);font-size:14px}
+
+/* RESULT */
+.backlink{background:none;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:14px;padding:0;margin-bottom:16px}
+.result-title{font-size:24px;margin-bottom:2px}
+.result-sub{color:var(--sub);font-size:14px;margin-bottom:26px}
+.rblock{border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:16px}
+.rblock h3{font-size:16px;display:flex;align-items:center;gap:8px}
+.badge{display:inline-block;background:var(--navy);color:#fff;font-size:13px;font-weight:700;padding:6px 12px;border-radius:8px}
+table.cmp{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+table.cmp th,table.cmp td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+table.cmp th{background:var(--card);color:var(--navy)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.split{grid-template-columns:1fr}}
+.split>div{background:var(--card);border-radius:10px;padding:14px}
+.split h4{font-size:13.5px;color:var(--navy);margin-bottom:6px}
+.levelbox{border-left:4px solid var(--blue);padding:4px 0 4px 14px;margin-top:8px;font-size:14px}
+.levelbox.deep{border-left-color:var(--navy);background:var(--card);padding:12px 14px;border-radius:0 10px 10px 0}
+.think-q{font-weight:700;margin-bottom:8px}
+.revealbtn{background:none;border:1px solid var(--navy);color:var(--navy);padding:7px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px}
+.reveal-ans{display:none;margin-top:10px;background:var(--card);padding:12px 14px;border-radius:8px;font-size:14px}
+.reveal-ans.show{display:block}
+.taglist span{display:inline-block;background:var(--card);border:1px solid var(--line);color:var(--sub);font-size:12.5px;padding:4px 9px;border-radius:6px;margin:2px 4px 2px 0}
+
+/* FINDER */
+.finderbox{max-width:560px;margin:0 auto;border:1px solid var(--line);border-radius:14px;padding:28px}
+.fq{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:16px;text-align:center}
+.fopts{display:grid;gap:10px}
+.fopts button{padding:13px;border:2px solid var(--line);background:#fff;border-radius:10px;font-family:inherit;font-size:14.5px;cursor:pointer;text-align:left}
+.fopts button:hover{border-color:var(--blue);background:var(--blue-l)}
+.fprogress{font-size:12.5px;color:var(--sub);text-align:center;margin-bottom:10px}
+.fresult{text-align:center}
+.fresult .badge{font-size:16px;padding:10px 18px;margin-bottom:14px}
+.fresult p{color:var(--sub);font-size:14.5px}
+.restartbtn{margin-top:14px;background:var(--navy);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-family:inherit;cursor:pointer;font-weight:700}
+
+/* ABOUT */
+.about h2{font-size:20px;margin-top:36px}
+.about p{font-size:15px;color:var(--text)}
+.steplist{counter-reset:s}
+.stepitem{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.stepitem .num{background:var(--navy);color:#fff;font-weight:700;min-width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px}
+footer{border-top:1px solid var(--line);text-align:center;color:var(--sub);font-size:12.5px;padding:20px}
+.namebadge{font-size:26px;font-weight:900;color:var(--navy);text-align:center;letter-spacing:1px;margin-bottom:4px}
+.namebadge+.sub{text-align:center;color:var(--sub);font-size:13px;margin-bottom:30px}
+ol.plain{padding-left:20px;margin:10px 0 0}
+ol.plain li{margin-bottom:8px;font-size:15px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){}}
+</style>
+</head>
+<body>
+<header>
+ <div class="headbar">
+  <div class="logo" onclick="showView('home')">SeparaLab</div>
+  <nav>
+   <button data-v="home" class="active" onclick="showView('home')">홈</button>
+   <button data-v="finder" onclick="showView('finder')">Separation Finder</button>
+   <button data-v="about" onclick="showView('about')">사이트 소개</button>
+  </nav>
+ </div>
+</header>
+
+<main class="wrap">
+
+<!-- HOME -->
+<div id="home" class="view active">
+ <div class="hero">
+  <h1>혼합물을 검색하면,<br>분리 방법이 보입니다</h1>
+  <p>두 물질의 성질 차이를 비교하고, 그 차이로 어떤 분리공정을 선택하는지 알아보세요.</p>
+  <div class="searchbox">
+   <input id="searchInput" placeholder="예: 에탄올 + 물" onkeydown="if(event.key==='Enter')doSearch()">
+   <button onclick="doSearch()">검색</button>
+  </div>
+ </div>
+ <div class="hint">아래 예시를 눌러도 바로 결과를 볼 수 있어요.</div>
+
+ <section class="block">
+  <h2>어떤 혼합물을 검색해 볼까요?</h2>
+  <div class="desc">아래 예시를 눌러 화학공학에서는 서로 다른 혼합물을 어떻게 분리하는지 확인해 보세요.</div>
+  <div class="cardgrid" id="cardGrid"></div>
+ </section>
+
+ <section class="block">
+  <h2>SeparaLab의 탐색 과정</h2>
+  <div class="flow" id="flowDiv"></div>
+ </section>
+
+ <div class="intronote">
+  <h3>처음 방문하셨나요?</h3>
+  <p style="font-size:14px;margin-bottom:6px">SeparaLab에서는 두 가지 이상의 물질로 이루어진 혼합물을 검색할 수 있습니다. 검색하면 각 물질의 성질을 비교하고, 어떤 차이를 이용해 분리할 수 있는지부터 실제 산업 공정까지 연결해서 보여줍니다.</p>
+  <ul><li>소금 + 물</li><li>기름 + 물</li><li>에탄올 + 물</li></ul>
+ </div>
+</div>
+
+<!-- RESULT -->
+<div id="results" class="view">
+ <button class="backlink" onclick="showView('home')">← 홈으로 돌아가기</button>
+ <div id="resultBody"></div>
+ <div id="notFound" style="display:none">
+  <h3>검색 결과가 없어요</h3>
+  <p style="color:var(--sub)">현재는 소금+물, 모래+물, 기름+물, 에탄올+물, 공기 5가지 예시만 준비되어 있어요. 위 예시 중 하나를 검색해 보세요.</p>
+ </div>
+</div>
+
+<!-- FINDER -->
+<div id="finder" class="view">
+ <h2 style="text-align:center">Separation Finder</h2>
+ <p style="text-align:center;color:var(--sub);font-size:14px;margin-bottom:26px">혼합물의 이름을 몰라도, 질문에 답하면서 적절한 분리 방법을 찾아보세요.</p>
+ <div class="finderbox">
+  <div class="fprogress" id="fProgress"></div>
+  <div id="finderBody"></div>
+ </div>
+</div>
+
+<!-- ABOUT -->
+<div id="about" class="view">
+ <div class="about">
+  <div class="namebadge">11009 안준형</div>
+  <div class="sub">화학공학 진로 탐구 프로젝트 · SeparaLab</div>
+
+  <h1>SeparaLab은 어떤 사이트인가요?</h1>
+  <ol class="plain">
+   <li>우리 주변에는 섞여 있는 물질이 정말 많다. 소금물, 공기, 원유까지 다 혼합물이다.</li>
+   <li>화학공학은 이런 혼합물에서 필요한 물질만 뽑아내는 방법을 고민하는 학문이라는 걸 알게 됐다.</li>
+   <li>그래서 혼합물 이름을 검색하면 <b>성질 비교 → 차이 발견 → 분리 원리 판단 → 공정 선택 → 산업 활용</b> 순서로 보여주는 사이트를 만들었다.</li>
+   <li>정답(예: "증류 쓴다")만 알려주는 게 아니라 <b>왜 그 방법을 쓰는지</b>까지 설명하는 걸 목표로 했다.</li>
+  </ol>
+
+  <h2>왜 이 사이트를 만들었나요?</h2>
+  <ol class="plain">
+   <li>화학공학을 찾아보면서 가장 재밌었던 건, 방법을 외우는 게 아니라 물질의 성질을 비교해서 공정을 고른다는 점이었다.</li>
+   <li>근데 증류, 여과 같은 용어는 처음 들으면 좀 어렵게 느껴질 수 있다고 생각했다.</li>
+   <li>그래서 어려운 용어부터 던지지 않고 <b>"이 두 물질은 뭐가 다르지?"</b>라는 질문부터 시작하게 만들었다.</li>
+  </ol>
+
+  <h2>어떤 점을 생각하며 만들었나요?</h2>
+  <ol class="plain">
+   <li>결과(증류 쓴다)보다 원인(끓는점이 다르다)을 먼저 보여주자고 생각했다.</li>
+   <li>추천 공정 하나만 던지지 않고, <b>다른 방법은 왜 안 되는지</b>도 같이 보여주기로 했다.</li>
+   <li>교과서 개념에서 끝나지 않게, 정수 처리·해수 담수화·산업용 가스 생산 같은 실제 사례까지 연결했다.</li>
+  </ol>
+
+  <h2>이렇게 사용해 보세요</h2>
+  <div class="steplist">
+   <div class="stepitem"><div class="num">1</div><div>혼합물을 검색합니다. (예: 에탄올 + 물)</div></div>
+   <div class="stepitem"><div class="num">2</div><div>두 물질의 성질을 비교합니다. (끓는점, 밀도, 상태, 용해성, 섞이는지 여부)</div></div>
+   <div class="stepitem"><div class="num">3</div><div>분리에 이용할 수 있는 차이를 확인합니다. (예: 휘발도 차이)</div></div>
+   <div class="stepitem"><div class="num">4</div><div>적절한 공정을 확인합니다. (예: 증류)</div></div>
+   <div class="stepitem"><div class="num">5</div><div>왜 이 공정을 쓰는지, 다른 공정은 왜 적합하지 않은지 확인합니다.</div></div>
+   <div class="stepitem"><div class="num">6</div><div>실제 산업에서는 어디에 활용되는지 확인합니다.</div></div>
+  </div>
+ </div>
+</div>
+
+</main>
+<footer>SeparaLab · 화학공학 분리공정 탐구 프로젝트</footer>
+
+<script>
+const MIX = {
+ salt: {
+  key:"salt", names:["소금","물","소금물","소금+물","소금 + 물"],
+  title:"소금 + 물", sub:"고체가 액체에 완전히 녹아있는 혼합물",
+  process:"증발 / 증류", principle:"휘발성(증발하려는 정도)의 차이",
+  cmp:[["구분","소금 (NaCl)","물"],["상태","고체","액체"],["끓는점/특징","고체 상태로는 증발하지 않음","100℃에서 끓어 기체로 변함"],["용해","물에 잘 녹음(이온화)","-"]],
+  why:"소금은 이온 상태로 물에 완전히 녹아있어 거름종이 같은 필터로는 걸러지지 않습니다. 반면 물은 가열하면 쉽게 기체(수증기)로 변합니다. 이 <b>휘발성 차이</b>를 이용해 물만 증발시키면 소금이 남습니다.",
+  whyNot:"여과는 사용할 수 없습니다. 소금은 물속에서 눈에 보이지 않을 만큼 작은 이온 상태로 존재하기 때문에 어떤 필터도 소금 입자를 걸러낼 수 없습니다.",
+  easy:"물은 가열하면 쉽게 수증기가 되어 날아가지만, 소금은 고체 상태를 유지합니다. 이 차이를 이용해 물을 증발시키면 소금만 남습니다. 반대로 수증기를 다시 식히면 순수한 물을 얻을 수 있는데, 이 과정을 증류라고 합니다.",
+  deep:"실제 산업에서는 단순 증발(소금 회수용)과, 수증기를 응축해 순수한 물까지 얻는 증류(담수화용)로 나뉩니다. 소금물처럼 한쪽 성분이 사실상 휘발되지 않는 경우, 상대휘발도가 매우 크기 때문에 비교적 적은 에너지로도 깨끗하게 분리할 수 있습니다.",
+  industry:["해수 담수화(바닷물에서 마실 물 얻기)","천일염 생산","폐수 처리장의 염분 회수"],
+  concepts:["휘발성","증발","증류","용해"],
+  thinkQ:"만약 소금이 아니라 물에 녹지 않는 아주 고운 진흙 가루가 섞여 있다면 어떤 방법을 먼저 시도해야 할까요?",
+  thinkA:"진흙은 물에 녹지 않고 고체 입자로 존재하므로 먼저 여과(또는 원심분리)로 입자를 걸러낼 수 있습니다. 소금처럼 완전히 녹아있는 물질과는 접근 방법이 다릅니다."
+ },
+ sand: {
+  key:"sand", names:["모래","모래+물","모래 + 물","흙탕물"],
+  title:"모래 + 물", sub:"녹지 않는 고체 입자가 액체 속에 섞여 있는 혼합물",
+  process:"여과 (Filtration)", principle:"입자 크기의 차이",
+  cmp:[["구분","모래","물"],["상태","고체","액체"],["용해 여부","물에 녹지 않음","-"],["입자 크기","필터보다 큼","분자 단위로 매우 작음"]],
+  why:"모래는 물에 녹지 않고 고체 입자 형태 그대로 남아 있습니다. 필터(거름종이)의 구멍보다 모래 입자가 크기 때문에, 물은 구멍을 통과하고 모래는 걸러집니다.",
+  whyNot:"증류는 필요하지 않습니다. 모래는 애초에 녹아있지 않고 크기 차이만으로 쉽게 분리되므로, 굳이 물을 끓여 증발시키는 것은 에너지 낭비입니다.",
+  easy:"모래는 아무리 저어도 물에 녹지 않고 알갱이 형태로 남아 있습니다. 구멍이 있는 거름종이에 부으면 물은 구멍을 통과해 빠져나가고, 물보다 큰 모래 알갱이는 걸러집니다.",
+  deep:"여과는 필터의 기공 크기(pore size)에 따라 걸러지는 입자의 최소 크기가 달라집니다. 산업에서는 모래 같은 큰 입자는 일반 여과로, 세균처럼 매우 작은 입자는 정밀여과·한외여과 같은 더 촘촘한 막을 사용해 걸러냅니다.",
+  industry:["정수장의 1차 침전·여과 공정","공장 폐수의 고체 슬러지 제거","커피 필터, 정수기 필터"],
+  concepts:["여과","입자 크기","불용성"],
+  thinkQ:"만약 모래 대신 물에 완전히 녹는 소금이 들어 있다면 여과를 사용할 수 있을까요?",
+  thinkA:"소금은 물에 녹아 매우 작은 이온 상태로 존재하기 때문에 일반적인 필터로 분리하기 어렵습니다. 따라서 증발이나 증류와 같은 다른 방법이 필요합니다."
+ },
+ oil: {
+  key:"oil", names:["기름","기름+물","기름 + 물","식용유"],
+  title:"기름 + 물", sub:"서로 섞이지 않는 두 액체로 이루어진 혼합물",
+  process:"중력 분리 / 분액 (Decantation)", principle:"밀도의 차이와 서로 섞이지 않는 성질(비혼화성)",
+  cmp:[["구분","기름","물"],["상태","액체","액체"],["밀도","물보다 작음(가벼움)","기준"],["혼합 여부","서로 섞이지 않음(비혼화성)","-"]],
+  why:"기름과 물은 서로 다른 성질(극성 차이) 때문에 섞이지 않고 층을 이룹니다. 기름이 물보다 밀도가 작기 때문에 가만히 두면 <b>기름은 위, 물은 아래</b>로 자연스럽게 분리됩니다. 이 상태에서 위층만 따라내거나 분액깔때기로 아래층을 빼내면 분리됩니다.",
+  whyNot:"여과는 사용할 수 없습니다. 두 물질 모두 액체이고 입자 크기 개념이 없기 때문에 필터로는 걸러지지 않습니다.",
+  easy:"기름과 물을 함께 두면 마치 드레싱처럼 두 층으로 나뉘는 것을 본 적이 있을 겁니다. 이는 두 물질이 서로 섞이지 않고, 가벼운 기름이 위로 뜨기 때문입니다. 이 층 분리를 이용해 물리적으로 나누는 방법이 분액(디캔테이션)입니다.",
+  deep:"이 원리를 상분리(phase separation)라고 합니다. 산업에서는 단순 침강조뿐 아니라, 두 액체의 밀도 차이가 작을 때 원심력을 이용해 분리 속도를 높이는 원심분리기(centrifuge)도 널리 사용됩니다.",
+  industry:["원유에서 물 제거(탈수 공정)","폐수 처리의 유분 제거","식품 산업의 유지 정제"],
+  concepts:["밀도","비혼화성","상분리","중력 분리"],
+  thinkQ:"두 액체의 밀도가 비슷해도 서로 섞이지 않는다면 분리할 수 있을까요?",
+  thinkA:"밀도 차이가 작으면 중력만으로는 분리 속도가 매우 느립니다. 이럴 때는 원심분리기로 강한 원심력을 가해 밀도 차이를 증폭시켜 더 빠르게 분리합니다."
+ },
+ ethanol: {
+  key:"ethanol", names:["에탄올","에탄올+물","에탄올 + 물","알코올"],
+  title:"에탄올 + 물", sub:"서로 완전히 섞이는(균일 혼합) 두 액체 — 조금 더 심화된 사례",
+  process:"증류 (Distillation)", principle:"휘발도(증발하려는 정도)의 차이",
+  cmp:[["구분","에탄올","물"],["상태","액체","액체"],["끓는점","약 78℃","100℃"],["섞임 여부","서로 완전히 섞임(균일 혼합물)","-"]],
+  why:"에탄올과 물은 완전히 섞여 있어 여과나 단순 침강으로는 분리할 수 없습니다. 대신 에탄올이 물보다 <b>더 쉽게 증발(휘발)</b>하는 성질을 이용합니다.<br><br><b>휘발도 차이 → 만들어지는 증기의 조성 차이 → 증류를 통한 분리</b><br><br>혼합물을 가열하면 두 물질 모두 어느 정도 증발하지만, 더 잘 증발하는 에탄올이 증기 속에 더 높은 비율로 포함됩니다. 이 증기를 모아 냉각하면 원래보다 에탄올 농도가 더 높은 액체를 얻을 수 있습니다. 이 과정을 여러 번 반복(단수를 거침)하면 점점 더 순수한 에탄올에 가까워집니다.",
+  whyNot:"여과나 중력 분리는 사용할 수 없습니다. 두 물질이 분자 단위로 완전히 균일하게 섞여 있어 입자 크기나 층 분리로 나눌 수 있는 경계가 존재하지 않기 때문입니다.",
+  easy:"에탄올은 물보다 쉽게 증발합니다. 따라서 두 물질을 가열했을 때 만들어지는 증기에는 에탄올이 상대적으로 더 많이 포함됩니다. 이 차이를 이용하여 두 물질을 나누는 방법이 증류입니다.",
+  deep:"실제 증류에서는 단순히 두 물질의 끓는점만 비교하지 않습니다. 두 성분의 <b>기-액 평형(Vapor-Liquid Equilibrium)</b>과 <b>상대휘발도(Relative Volatility)</b>를 고려하여 분리 가능성을 판단합니다. 기-액 평형이란 액체와 그 위의 증기가 서로 균형을 이루는 상태에서, 증기 속 성분 비율이 액체와 어떻게 다른지를 나타낸 관계입니다. 상대휘발도는 두 성분이 얼마나 잘 나뉘는지를 나타내는 값으로, 이 값이 클수록 적은 단수로도 쉽게 분리됩니다.<br><br>다만 에탄올-물은 약 96% 농도 부근에서 <b>공비(Azeotrope)</b>라는 지점이 생겨, 일반적인 증류만으로는 그 이상 순도를 높이기 어렵습니다. 이 때문에 무수 에탄올을 만들려면 공비 증류나 막분리 같은 추가 공정이 필요합니다.",
+  industry:["주류(소주 등) 제조의 알코올 농축","바이오 에탄올(연료용) 정제","의약용·공업용 무수 에탄올 생산"],
+  concepts:["휘발도","증류","기-액 평형(Vapor-Liquid Equilibrium)","상대휘발도(Relative Volatility)","공비(Azeotrope)"],
+  thinkQ:"두 액체의 끓는점이 완전히 같다면 증류로 쉽게 분리할 수 있을까요?",
+  thinkA:"끓는점이 같으면 두 물질의 휘발도가 비슷해 증기 조성이 액체 조성과 거의 차이가 없습니다. 즉 상대휘발도가 1에 가까워 증류로 분리하기가 매우 어렵거나 사실상 불가능해집니다."
+ },
+ air: {
+  key:"air", names:["공기","공기분리","질소","산소"],
+  title:"공기", sub:"질소, 산소 등 여러 기체로 이루어진 혼합물",
+  process:"저온 증류 (심냉 공기분리)", principle:"끓는점(액화되는 온도)의 차이",
+  cmp:[["구분","질소(N₂)","산소(O₂)"],["공기 중 비율","약 78%","약 21%"],["끓는점(1기압)","약 -196℃","약 -183℃"],["액화되는 순서","더 낮은 온도에서 액화","상대적으로 높은 온도에서 액화"]],
+  why:"공기를 압축하고 매우 낮은 온도로 냉각하면 먼저 액체 공기가 만들어집니다. 이 액체를 서서히 데우면(정밀 증류탑을 거치면), 끓는점이 낮은 질소가 먼저 기체로 빠져나가고 끓는점이 더 높은 산소가 나중에 분리됩니다. 물-에탄올 증류와 원리는 같지만, 상온이 아니라 극저온에서 진행된다는 점이 다릅니다.",
+  whyNot:"여과나 단순 응축만으로는 분리할 수 없습니다. 기체 상태에서는 입자 크기 차이가 의미 없고, 각 성분이 액화되는 온도가 다르다는 점을 정밀하게 이용해야 하기 때문에 정밀한 저온 증류탑이 필요합니다.",
+  easy:"공기 속 질소와 산소는 서로 다른 온도에서 액체로 변합니다(액화). 공기를 아주 차갑게 식혀 액체로 만든 뒤 천천히 데우면, 먼저 기체로 변하는 질소와 나중에 변하는 산소를 나누어 모을 수 있습니다.",
+  deep:"이 공정을 심냉 공기분리(cryogenic air separation)라고 하며, 다단 증류탑을 이용해 질소·산소·아르곤까지 정밀하게 분리합니다. 원리는 에탄올-물 증류와 동일한 기-액 평형 개념을 따르지만, 처리 온도가 영하 180℃ 이하로 매우 낮다는 점이 산업적으로 가장 큰 도전 과제입니다.",
+  industry:["의료용 산소 생산","반도체 공정용 초고순도 질소","제철소의 산소 공급","식품 포장용 질소 충전"],
+  concepts:["끓는점","액화","저온 증류","기-액 평형"],
+  thinkQ:"만약 두 기체의 끓는점 차이가 지금보다 훨씬 작다면 분리는 더 쉬워질까요, 어려워질까요?",
+  thinkA:"끓는점 차이가 작을수록 상대휘발도가 낮아져 증류탑에서 더 많은 단수(반복 분리)가 필요합니다. 즉 분리가 더 어려워지고 더 많은 에너지와 장치가 필요합니다."
+ },
+ acetone: {
+  key:"acetone", names:["아세톤","아세톤+물","아세톤 + 물"],
+  title:"아세톤 + 물", sub:"서로 완전히 섞이는 두 액체 (에탄올+물과 비슷하지만 더 단순한 사례)",
+  process:"증류 (Distillation)", principle:"휘발도(끓는점)의 차이",
+  cmp:[["구분","아세톤","물"],["상태","액체","액체"],["끓는점","약 56℃","100℃"],["섞임 여부","서로 완전히 섞임","-"]],
+  why:"아세톤은 물보다 끓는점이 훨씬 낮아 더 쉽게 증발합니다. 혼합물을 가열하면 증기 속에 아세톤이 더 높은 비율로 포함되고, 이 증기를 모아 식히면 아세톤 농도가 높은 액체를 얻을 수 있습니다.",
+  whyNot:"여과나 중력 분리는 사용할 수 없습니다. 두 물질이 분자 단위로 완전히 섞여 있어 입자나 층으로 나눌 경계가 없기 때문입니다.",
+  easy:"아세톤은 물보다 훨씬 빨리 증발합니다. 가열했을 때 나오는 증기에는 아세톤이 더 많이 들어있어서, 이 증기를 모아 식히면 아세톤을 더 진하게 얻을 수 있습니다.",
+  deep:"에탄올-물처럼 기-액 평형 개념이 그대로 적용되지만, 아세톤-물은 공비(Azeotrope)가 없어서 일반적인 증류만으로도 비교적 순수한 아세톤까지 얻을 수 있다는 차이가 있습니다.",
+  industry:["매니큐어 리무버 정제","반도체·의약 공정의 용매 회수","페인트 시너 정제"],
+  concepts:["휘발도","증류","기-액 평형"],
+  thinkQ:"아세톤 대신 끓는점이 물과 거의 비슷한 물질이 섞여 있다면 증류로 쉽게 분리될까요?",
+  thinkA:"끓는점 차이가 작으면 상대휘발도가 1에 가까워져 증류로 분리하기가 매우 어려워집니다."
+ },
+ sugar: {
+  key:"sugar", names:["설탕","설탕+물","설탕 + 물","설탕물"],
+  title:"설탕 + 물", sub:"고체가 액체에 녹아 있는 혼합물 — 결정화까지 연결되는 사례",
+  process:"증발 / 결정화 (Crystallization)", principle:"용해도가 물의 양(농도)에 따라 달라지는 성질",
+  cmp:[["구분","설탕","물"],["상태","고체","액체"],["용해 여부","물에 녹음(온도·양에 따라 한계 있음)","-"],["끓는점","고체 상태로는 증발하지 않음","100℃에서 증발"]],
+  why:"설탕물을 가열해 물을 증발시키면 남아있는 물의 양이 줄어듭니다. 물이 줄어들수록 녹아있을 수 있는 설탕의 양(용해도)도 줄어들기 때문에, 다 녹지 못한 설탕이 고체 결정으로 석출됩니다.",
+  whyNot:"단순 여과는 사용할 수 없습니다. 설탕은 이미 물에 녹아 있는 상태라 필터로는 걸러지지 않고, 먼저 물을 증발시켜 농도를 높여야 결정이 생깁니다.",
+  easy:"설탕물을 가열해서 물을 증발시키면 물의 양이 점점 줄어듭니다. 물이 줄어들수록 그 안에 녹아 있을 수 있는 설탕의 양도 줄어들기 때문에, 더 이상 녹지 못한 설탕이 고체 알갱이(결정)로 나타납니다.",
+  deep:"이 과정을 결정화(Crystallization)라고 합니다. 용해도는 온도와 용매(물)의 양에 따라 달라지는데, 산업에서는 온도를 서서히 낮추는 냉각 결정화도 함께 사용해 더 크고 순수한 결정을 만듭니다.",
+  industry:["설탕 공장의 원당 정제","소금 결정 생산","의약품 결정화 공정"],
+  concepts:["용해도","증발","결정화"],
+  thinkQ:"물을 아주 빠르게 증발시키면 만들어지는 설탕 결정의 크기는 어떻게 달라질까요?",
+  thinkA:"너무 빠르게 증발시키면 결정이 자랄 시간이 부족해 작고 불균일한 결정이 많이 생깁니다. 천천히 진행하면 더 크고 균일한 결정을 얻기 쉽습니다."
+ },
+ coffee: {
+  key:"coffee", names:["커피","커피찌꺼기","커피 찌꺼기","커피액"],
+  title:"커피 찌꺼기 + 커피액", sub:"고체 찌꺼기와 액체가 섞인, 일상에서 가장 흔한 여과 사례",
+  process:"여과 (Filtration)", principle:"입자 크기 차이 (고체-액체 분리)",
+  cmp:[["구분","커피 찌꺼기","커피액"],["상태","고체(원두 가루)","액체"],["특징","물에 녹지 않는 입자","맛·향 성분이 물에 녹아있음"]],
+  why:"커피 가루는 물에 녹지 않는 고체 입자이고, 맛과 향을 내는 성분은 물에 녹아 액체(커피액)에 섞여 있습니다. 종이 필터를 쓰면 커피 가루는 걸러지고 커피액만 통과합니다.",
+  whyNot:"증류는 필요하지 않습니다. 향과 맛 성분까지 함께 남겨야 하는데, 증류처럼 끓여서 증발시키면 오히려 향이 날아가 버립니다.",
+  easy:"커피 필터의 작은 구멍은 물과 그 안에 녹은 성분은 통과시키지만, 그보다 큰 커피 가루는 통과하지 못하게 막아줍니다.",
+  deep:"필터의 기공 크기에 따라 커피의 맛과 투명도가 달라집니다. 같은 원리가 술이나 주스 제조에서 찌꺼기를 걸러내는 여과 공정에도 그대로 쓰입니다.",
+  industry:["커피·차 추출","양조업의 술지게미 제거","주스 공장의 과즙 여과"],
+  concepts:["여과","입자 크기","고체-액체 분리"],
+  thinkQ:"필터의 구멍이 너무 크면 어떤 문제가 생길까요?",
+  thinkA:"구멍이 너무 크면 작은 커피 가루까지 통과해서 커피가 탁해지고 텁텁한 맛이 날 수 있습니다."
+ },
+ mud: {
+  key:"mud", names:["진흙","진흙+물","진흙 + 물","흙탕물","침전"],
+  title:"진흙 + 물", sub:"침전과 여과, 두 공정을 이어서 쓰는 사례",
+  process:"침전(Sedimentation) + 여과 (Filtration)", principle:"입자 크기·무게 차이 (2단계 공정)",
+  cmp:[["구분","진흙","물"],["상태","고체(크기가 다른 여러 입자)","액체"],["특징","무거운 입자와 미세한 입자가 섞여 있음","-"]],
+  why:"진흙에는 크기가 다른 여러 입자가 섞여 있습니다. 먼저 가만히 두면 무겁고 큰 입자가 가라앉는 침전이 일어나고, 남아있는 미세한 입자는 여과로 추가로 걸러냅니다.",
+  whyNot:"여과만으로는 부족합니다. 아주 미세한 진흙 입자는 필터를 금방 막히게 하므로, 먼저 침전으로 큰 입자를 제거하는 게 효율적입니다.",
+  easy:"흙탕물을 가만히 두면 무거운 흙 입자가 바닥에 가라앉습니다(침전). 남아있는 뿌연 물을 필터에 거르면(여과) 더 맑은 물을 얻을 수 있습니다.",
+  deep:"실제 정수 처리에서는 응집제를 넣어 미세 입자를 더 크게 뭉치게 한 뒤(응집·침전) 여과와 소독을 거쳐 식수를 만듭니다. 이렇게 여러 공정을 순서대로 연결하는 것을 공정 흐름이라고 합니다.",
+  industry:["정수장의 정수 처리 공정","하수처리장의 1차 침전지","광산의 폐수 처리"],
+  concepts:["침전","여과","응집"],
+  thinkQ:"진흙 입자가 너무 미세해서 잘 가라앉지 않는다면 어떻게 해야 할까요?",
+  thinkA:"응집제를 넣어 미세 입자들을 서로 뭉치게 만들면(응집) 입자가 커져서 더 잘 가라앉거나 여과로 걸러내기 쉬워집니다."
+ },
+ crude: {
+  key:"crude", names:["원유","분별증류","원유 분리"],
+  title:"원유", sub:"수백 가지 탄화수소가 섞인 혼합물 — 가장 화학공학다운 사례",
+  process:"분별 증류 (Fractional Distillation)", principle:"여러 성분의 끓는점 범위 차이",
+  cmp:[["유분","끓는점 범위","주요 성분/용도"],["LPG","약 40℃ 이하","프로판, 부탄"],["나프타","약 40~150℃","화학 원료"],["등유","약 150~250℃","항공유 등"],["경유","약 250~350℃","디젤 연료"],["잔사유","약 350℃ 이상","아스팔트 등"]],
+  why:"원유는 탄소 수가 다른 수많은 탄화수소가 섞인 혼합물입니다. 탄소 수가 적을수록 끓는점이 낮아 먼저 기체로 분리되고, 탄소 수가 많을수록 나중에 분리됩니다. 증류탑은 아래에서 위로 갈수록 온도가 낮아지도록 만들어져 있어, 각 높이마다 해당 끓는점 범위의 성분(유분)을 따로 뽑아냅니다.",
+  whyNot:"한 번의 단순 증류로는 부족합니다. 원유는 두세 가지가 아니라 수백 가지 성분이 섞여 있어, 여러 단(트레이)을 가진 증류탑으로 끓는점 범위별로 나눠야 합니다.",
+  easy:"원유 속에는 끓는점이 서로 다른 여러 물질이 섞여 있습니다. 원유를 증류탑에 넣고 가열하면, 끓는점이 낮은 성분(LPG 등)은 위쪽에서, 끓는점이 높은 성분(경유·아스팔트 등)은 아래쪽에서 각각 분리되어 나옵니다.",
+  deep:"기본 원리는 앞서 다룬 증류와 같은 기-액 평형을 따르지만, 성분이 매우 많고 끓는점이 연속적으로 분포되어 있어 하나의 온도가 아니라 '끓는점 범위(비점 범위)'로 나눈다는 점이 다릅니다. 각 유분은 이후 추가 공정을 거쳐 휘발유, 경유 등 최종 제품으로 만들어집니다.",
+  industry:["정유공장의 원유 정제","LPG·휘발유·경유·아스팔트 생산"],
+  concepts:["분별증류","끓는점 범위","탄화수소","기-액 평형"],
+  thinkQ:"증류탑의 위쪽과 아래쪽 중, 어디에서 끓는점이 더 낮은 성분이 나올까요?",
+  thinkA:"증류탑은 위로 갈수록 온도가 낮으므로, 끓는점이 낮은 가벼운 성분(LPG 등)은 위쪽에서, 끓는점이 높은 무거운 성분은 아래쪽에서 나옵니다."
+ }
+};
+const ORDER=["salt","sand","oil","ethanol","air","acetone","sugar","coffee","mud","crude"];
+
+function renderCards(){
+ const g=document.getElementById('cardGrid');
+ g.innerHTML=ORDER.map(k=>{const m=MIX[k];return `
+  <div class="mcard">
+   <h3>${m.title}</h3>
+   <div class="q">${m.sub}</div>
+   <span class="tag">${m.principle.split('(')[0].trim()}</span>
+   <span class="tag">${m.process}</span>
+   <button onclick="openResult('${m.key}')">검색해 보기</button>
+  </div>`;}).join('');
+}
+function renderFlow(){
+ const steps=[["혼합물","검색 입력"],["물질 성질 비교","끓는점·밀도·입자 크기 등"],["차이점 발견","두 물질은 무엇이 다른가?"],["분리 원리 판단","어떤 차이를 이용할 수 있는가?"],["공정 선택","증류·여과·중력 분리 등"],["산업 활용","실제 공장에서 어떻게 쓰이는가?"]];
+ const el=document.getElementById('flowDiv');
+ el.innerHTML=steps.map((s,i)=>`<div class="step"><b>${s[0]}</b>${s[1]}</div>`+(i<steps.length-1?'<div class="arrow">→</div>':'')).join('');
+}
+function showView(v){
+ document.querySelectorAll('.view').forEach(e=>e.classList.remove('active'));
+ document.getElementById(v).classList.add('active');
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+ window.scrollTo(0,0);
+ if(v==='finder') resetFinder();
+}
+function doSearch(){
+ const q=document.getElementById('searchInput').value.trim().toLowerCase().replace(/\s+/g,'');
+ let found=null;
+ for(const k of ORDER){ if(MIX[k].names.some(n=>n.toLowerCase().replace(/\s+/g,'').includes(q)&&q.length>0) || q.includes(k)){ found=k; break;} }
+ if(!found){ for(const k of ORDER){ const first=MIX[k].names[0]; if(q.includes(first)){found=k;break;} } }
+ if(found) openResult(found); else showNotFound();
+}
+function showNotFound(){
+ showView('results');
+ document.getElementById('resultBody').innerHTML='';
+ document.getElementById('notFound').style.display='block';
+}
+function openResult(key){
+ const m=MIX[key];
+ document.getElementById('notFound').style.display='none';
+ document.getElementById('resultBody').innerHTML=`
+  <div class="result-title">${m.title}</div>
+  <div class="result-sub">${m.sub}</div>
+
+  <div class="rblock" style="text-align:center">
+   <div style="font-size:13px;color:var(--sub);margin-bottom:8px">추천 분리공정</div>
+   <div class="badge" style="font-size:18px">${m.process}</div>
+   <p style="margin-top:12px;color:var(--sub)">핵심 원리: <b style="color:var(--navy)">${m.principle}</b></p>
+  </div>
+
+  <div class="rblock">
+   <h3>두 물질의 주요 특성 비교</h3>
+   <table class="cmp"><tr>${m.cmp[0].map(c=>`<th>${c}</th>`).join('')}</tr>${m.cmp.slice(1).map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table>
+  </div>
+
+  <div class="split">
+   <div><h4>✔ 왜 이 공정을 사용하는가?</h4><p style="font-size:13.5px;margin:0">${m.why}</p></div>
+   <div><h4>✘ 다른 공정은 왜 적합하지 않은가?</h4><p style="font-size:13.5px;margin:0">${m.whyNot}</p></div>
+  </div>
+
+  <div class="rblock" style="margin-top:16px">
+   <h3>쉽게 이해하기</h3>
+   <div class="levelbox">${m.easy}</div>
+   <h3 style="margin-top:18px">조금 더 알아보기 <span style="font-size:12px;color:var(--blue);font-weight:500">Engineering Insight</span></h3>
+   <div class="levelbox deep">${m.deep}</div>
+  </div>
+
+  <div class="rblock">
+   <h3>실제 산업 활용</h3>
+   <ul style="margin:6px 0 0;padding-left:18px;font-size:14px">${m.industry.map(i=>`<li>${i}</li>`).join('')}</ul>
+   <div class="taglist" style="margin-top:12px">${m.concepts.map(c=>`<span>${c}</span>`).join('')}</div>
+  </div>
+
+  <div class="rblock">
+   <h3>생각해 보기</h3>
+   <div class="think-q">${m.thinkQ}</div>
+   <button class="revealbtn" onclick="this.nextElementSibling.classList.toggle('show')">정답 보기</button>
+   <div class="reveal-ans">${m.thinkA}</div>
+  </div>
+ `;
+ showView('results');
+}
+
+/* FINDER decision tree */
+const TREE={
+ start:{q:"분리하려는 물질의 상태는 무엇인가요?",opts:[
+   {label:"고체 + 액체",next:"sl_dissolve"},
+   {label:"액체 + 액체",next:"ll_mix"},
+   {label:"기체 + 기체",next:"gg"},
+   {label:"고체 + 고체",next:"ss"}]},
+ sl_dissolve:{q:"고체가 액체에 녹아 있나요?",opts:[
+   {label:"녹아 있지 않다 (입자로 떠있음)",next:"res_filter"},
+   {label:"완전히 녹아 있다",next:"res_evap"}]},
+ ll_mix:{q:"두 액체가 서로 섞이나요?",opts:[
+   {label:"섞이지 않는다",next:"ll_density"},
+   {label:"완전히 섞인다",next:"ll_volatile"}]},
+ ll_density:{q:"두 액체의 밀도 차이가 충분한가요?",opts:[
+   {label:"예, 차이가 크다",next:"res_gravity"},
+   {label:"차이가 작다",next:"res_centrifuge"}]},
+ ll_volatile:{q:"두 액체의 휘발도(끓는점) 차이가 있나요?",opts:[
+   {label:"예, 차이가 있다",next:"res_distill"},
+   {label:"거의 같다",next:"res_hard"}]},
+ gg:{q:"두 기체의 끓는점(액화 온도) 차이가 있나요?",opts:[
+   {label:"예, 차이가 있다",next:"res_cryo"},
+   {label:"차이가 거의 없다",next:"res_hard"}]},
+ ss:{q:"두 고체의 입자 크기 또는 자성에 차이가 있나요?",opts:[
+   {label:"입자 크기가 다르다",next:"res_sieve"},
+   {label:"자석에 반응하는 정도가 다르다",next:"res_magnet"}]},
+ res_filter:{result:"여과 (Filtration)",why:"녹지 않은 고체 입자는 필터의 기공보다 커서 걸러낼 수 있습니다."},
+ res_evap:{result:"증발 / 증류",why:"완전히 녹은 물질은 필터로 걸러지지 않으므로, 액체를 증발시켜 고체를 남기거나 증기를 모아 액체를 회수합니다."},
+ res_gravity:{result:"중력 분리 / 분액 (Decantation)",why:"밀도 차이가 크면 가만히 두는 것만으로도 층이 나뉘어 쉽게 분리할 수 있습니다."},
+ res_centrifuge:{result:"원심 분리 (Centrifugation)",why:"밀도 차이가 작아 중력만으로는 느리게 분리되므로, 원심력으로 분리 속도를 높입니다."},
+ res_distill:{result:"증류 (Distillation)",why:"더 잘 휘발되는 성분이 증기에 더 많이 포함되는 원리를 이용해 반복적으로 농축합니다."},
+ res_cryo:{result:"저온 증류 (심냉 분리)",why:"각 기체가 액화되는 온도가 다르므로, 매우 낮은 온도에서 증류하듯 순서대로 분리합니다."},
+ res_sieve:{result:"체 거름 (Sieving)",why:"입자 크기가 다르면 적절한 체눈 크기의 체로 걸러 분리할 수 있습니다."},
+ res_magnet:{result:"자기 분리 (Magnetic Separation)",why:"자성체만 자석에 붙어 분리되므로, 나머지 물질과 물리적으로 나눌 수 있습니다."},
+ res_hard:{result:"일반적인 방법으로는 분리가 어려움",why:"휘발도나 끓는점 차이가 거의 없으면 공비 증류, 막분리 등 특수한 추가 공정이 필요합니다."}
+};
+let fPath=['start'], fStep='start';
+function resetFinder(){ fStep='start'; fPath=['start']; renderFinder(); }
+function renderFinder(){
+ document.getElementById('fProgress').textContent = `질문 ${fPath.filter(s=>TREE[s].q).length} 단계`;
+ const node=TREE[fStep];
+ const body=document.getElementById('finderBody');
+ if(node.q){
+  body.innerHTML=`<div class="fq">${node.q}</div><div class="fopts">${node.opts.map((o,i)=>`<button onclick="finderNext('${o.next}')">${o.label}</button>`).join('')}</div>`;
+ } else {
+  body.innerHTML=`<div class="fresult"><div style="font-size:13px;color:var(--sub);margin-bottom:8px">추천 분리 방법</div><div class="badge">${node.result}</div><p style="margin-top:14px">${node.why}</p><button class="restartbtn" onclick="resetFinder()">다시 시작하기</button></div>`;
+ }
+}
+function finderNext(next){ fStep=next; fPath.push(next); renderFinder(); }
+
+renderCards(); renderFlow(); renderFinder();
+</script>
+</body>
+</html>
